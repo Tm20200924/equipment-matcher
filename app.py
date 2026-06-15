@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
+try:
+    import openpyxl
+    HAS_OPENPYXL = True
+except ImportError:
+    HAS_OPENPYXL = False
 import os, sys, json, io
 from datetime import datetime
 
@@ -115,7 +120,10 @@ with tab1:
         if uploaded:
             ext = uploaded.name.rsplit(".", 1)[-1].lower()
             if ext in ("xlsx", "xls"):
-                inquiries = eng.parse_inquiry_excel(uploaded)
+                if HAS_OPENPYXL:
+                    inquiries = eng.parse_inquiry_excel(uploaded)
+                else:
+                    st.warning("Excel support requires openpyxl. Use CSV or paste text.")
             elif ext == "csv":
                 df = pd.read_csv(io.BytesIO(uploaded.getvalue()))
                 for i, row in df.iterrows():
