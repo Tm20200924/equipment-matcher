@@ -2,13 +2,19 @@
 """LiuGong Equipment Matching Engine v19 - Clean & Focused"""
 import os, json, re, sys
 from datetime import datetime
-import openpyxl
+try:
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    HAS_OPENPYXL = True
+except ImportError:
+    HAS_OPENPYXL = False
+    Font = PatternFill = Alignment = Border = Side = None
+
 try:
     import requests
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INQUIRIES_DIR = os.path.join(BASE_DIR, "inquiries")
