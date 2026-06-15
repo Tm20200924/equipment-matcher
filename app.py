@@ -34,8 +34,9 @@ def load_data():
             try:
                 import gdown
                 gdown.download(url, path, quiet=True)
-            except Exception:
-                pass
+                st.sidebar.success(f"Downloaded {key}")
+            except Exception as e:
+                st.sidebar.warning(f"GDrive download failed: {e}")
 
     # Set paths for engine
     eng.CONFIG_PATH = config_path
@@ -44,6 +45,23 @@ def load_data():
 
     config = eng.load_config()
     db = eng.load_db()
+
+    # Fallback to demo data if no products loaded
+    if not db:
+        try:
+            from engine.demo_data import to_product_db, to_competitor_db
+            demo = to_product_db()
+            comp_demo = to_competitor_db()
+            # Write demo data so engine can load it
+            import json
+            with open(db_path, "w", encoding="utf-8") as f:
+                json.dump(demo, f, ensure_ascii=False)
+            with open(comp_path, "w", encoding="utf-8") as f:
+                json.dump(comp_demo, f, ensure_ascii=False)
+            db = eng.load_db()
+            st.sidebar.info(f"Using demo data ({len(db)} products). Connect Google Drive for full data.")
+        except Exception as e:
+            st.sidebar.warning(f"Demo fallback failed: {e}")
 
     # Override config from Streamlit secrets if available
     if "config" in st.secrets:
