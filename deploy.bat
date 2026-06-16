@@ -2,7 +2,7 @@
 chcp 65001 >nul
 cd /d "%~dp0"
 echo ==============================================
-echo   LiuGong Matcher - GitHub Push & Deploy
+echo   Equipment Matcher - GitHub Push & Deploy
 echo ==============================================
 echo.
 
@@ -22,10 +22,10 @@ if errorlevel 1 (
 )
 
 echo [1/3] Creating GitHub repository...
-%GH% repo create liugong-equipment-matcher --public --source=. --remote=origin --push -d "LiuGong Equipment Matching Engine - DAP price calculation with cross-verification"
+%GH% repo create equipment-matcher --public --source=. --remote=origin --push -d "Equipment Matching Engine - DAP price calculation with cross-verification"
 if errorlevel 1 (
     echo [!] Repo creation failed. Trying push to existing...
-    git remote add origin https://github.com/YOUR_USERNAME/liugong-equipment-matcher.git 2>nul
+    git remote add origin https://github.com/YOUR_USERNAME/equipment-matcher.git 2>nul
     git push -u origin master
 )
 
@@ -42,7 +42,7 @@ echo ==============================================
 echo   1. Open https://share.streamlit.io
 echo   2. Sign in with GitHub
 echo   3. Click "New app"
-echo   4. Select repo: liugong-equipment-matcher
+echo   4. Select repo: equipment-matcher
 echo   5. Main file path: app.py
 echo   6. Click Deploy!
 echo ==============================================

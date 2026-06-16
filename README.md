@@ -1,6 +1,6 @@
-﻿# LiuGong Equipment Matcher v19
+﻿# Equipment Matcher v19
 
-柳工设备智能匹配引擎 — 客户询盘 → 产品匹配 → DAP满洲里到岸价计算 → 交叉验证
+设备智能匹配引擎 — 客户询盘 → 产品匹配 → DAP满洲里到岸价计算 → 交叉验证
 
 ## 功能
 

@@ -2,7 +2,7 @@
 chcp 65001 >nul
 cd /d "%~dp0"
 echo ========================================
-echo   LiuGong Equipment Matcher v19
+echo   Equipment Matcher v19
 echo ========================================
 echo.
 echo [1] Streamlit Web App (??)
