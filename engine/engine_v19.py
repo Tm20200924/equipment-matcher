@@ -268,7 +268,7 @@ def classify_inquiry(name):
     return None
 
 def is_non_own(name):
-    """Whitelist: only match if inquiry has LiuGong category keywords or competitor model."""
+    """Whitelist: only match if inquiry has Equipment category keywords or competitor model."""
     if classify_inquiry(name):
         return False
     comp, _ = detect_competitor(name)
@@ -336,7 +336,7 @@ def extract_model_ton_from_text(text, comp_db=None):
 # ===== MODEL TONNAGE =====
 
 def model_tonnage(model):
-    """Extract tonnage from LiuGong model number."""
+    """Extract tonnage from Equipment model number."""
     m = str(model).upper().replace(" ", "").replace("CLG", "")
     md = re.sub(r"[A-Z\-]+$", "", m)
     
@@ -441,9 +441,9 @@ def roller_hint(text):
 # ===== CORE MATCHING =====
 
 def match_products(name, db, config):
-    """Match inquiry to LiuGong products. Returns (candidates, ton, bucket, verification)."""
+    """Match inquiry to Equipment products. Returns (candidates, ton, bucket, verification)."""
     
-    # Reject non-LiuGong equipment
+    # Reject non-Equipment equipment
     if is_non_own(name):
         return [], 0, 0, None
     
@@ -529,7 +529,7 @@ def match_products(name, db, config):
         return candidates, comp_ton, extract_bucket(name), verification
         # If competitor match fails, fall through to normal matching
     
-    # Normal LiuGong matching
+    # Normal Equipment matching
     cat = classify_inquiry(name)
     ton = extract_ton(name)
     bucket = extract_bucket(name)
@@ -830,7 +830,7 @@ def match_with_llm(name, db, config, api_key=None, model="gpt-4o-mini"):
     
     parsed = parse_inquiry_with_llm(name, api_key, model)
     
-    # If LLM marked as non-LiuGong
+    # If LLM marked as non-Equipment
     if parsed.get("notes") == "non_own" or parsed.get("category") is None:
         return [], 0, 0, {"query": name, "parser": "llm", "parsed": parsed, "rejected": "non_own"}
     
@@ -861,7 +861,7 @@ def match_with_llm(name, db, config, api_key=None, model="gpt-4o-mini"):
                 comp_ton = online["tonnage"]
         
         comp_cat = cat
-        candidates = match_competitor_to_liugong(comp_brand, comp_model, comp_ton, comp_cat, db, config)
+        candidates = match_competitor_to_equipment(comp_brand, comp_model, comp_ton, comp_cat, db, config)
         if candidates and candidates[0]["score"] > 5:
             verification = {
                 "query": name, "parser": "llm" if api_key else "regex",
