@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""LiuGong Equipment Matching Engine v19 - Clean & Focused"""
+"""Equipment Matching Engine v19 - Clean & Focused"""
 import os, json, re, sys
 from datetime import datetime
 try:
@@ -150,7 +150,7 @@ def verify_specs_online(model, category, local_ton=0, local_hp=0, local_bucket=0
         "local_ton": local_ton, "local_hp": local_hp, "local_bucket": local_bucket,
         "status": "no_data"
     }
-    online = search_online_specs(f"LiuGong {model} specifications weight horsepower")
+    online = search_online_specs(f"Equipment {model} specifications weight horsepower")
     if online:
         ot = online.get("tonnage", 0) or 0
         oh = online.get("hp", 0) or 0
@@ -221,7 +221,7 @@ CAT_CN = {
     "AWP": "高空作业平台", "TRUCK": "汽车吊", "TELEHANDLER": "叉装车", "ELECTRIC": "电动产品",
 }
 
-# Keywords for matching inquiry text to LiuGong equipment categories
+# Keywords for matching inquiry text to equipment categories
 CATEGORY_KEYWORDS = {
     "挖掘机": ["挖掘", "挖机", "excavator", "экскаватор", "轮挖"],
     "装载机": ["装载", "loader", "погрузчик", "铲车", "фронтальный"],
@@ -237,8 +237,8 @@ CATEGORY_KEYWORDS = {
     "高空作业平台": ["高空作业", "AWP", "подъемник", "升降"],
 }
 
-# Equipment LiuGong does NOT produce (for display purposes)
-NON_LIUGONG = ["洒水车", "摊铺机", "焊机", "搅拌机", "叉车", "水泵", "发电机"]
+# Equipment NOT produced (for display purposes)
+NON_OWN = ["洒水车", "摊铺机", "焊机", "搅拌机", "叉车", "水泵", "发电机"]
 
 # ===== COMPETITOR DETECTION =====
 
@@ -267,7 +267,7 @@ def classify_inquiry(name):
                 return cat
     return None
 
-def is_non_liugong(name):
+def is_non_own(name):
     """Whitelist: only match if inquiry has LiuGong category keywords or competitor model."""
     if classify_inquiry(name):
         return False
@@ -444,7 +444,7 @@ def match_products(name, db, config):
     """Match inquiry to LiuGong products. Returns (candidates, ton, bucket, verification)."""
     
     # Reject non-LiuGong equipment
-    if is_non_liugong(name):
+    if is_non_own(name):
         return [], 0, 0, None
     
     # Detect competitor
@@ -764,7 +764,7 @@ def generate_report(inquiries, db, config, fname):
             ws.cell(row=rn, column=2, value=name)
             ws.cell(row=rn, column=3, value=qty)
             ws.cell(row=rn, column=4, value=cat or "非设备")
-            reason = "非柳工产品" if is_non_liugong(name) else "未找到匹配"
+            reason = "非自有产品" if is_non_own(name) else "未找到匹配"
             ws.cell(row=rn, column=7, value=reason)
             for c in range(1, len(headers)+1):
                 cell = ws.cell(row=rn, column=c)
@@ -831,8 +831,8 @@ def match_with_llm(name, db, config, api_key=None, model="gpt-4o-mini"):
     parsed = parse_inquiry_with_llm(name, api_key, model)
     
     # If LLM marked as non-LiuGong
-    if parsed.get("notes") == "non_liugong" or parsed.get("category") is None:
-        return [], 0, 0, {"query": name, "parser": "llm", "parsed": parsed, "rejected": "non_liugong"}
+    if parsed.get("notes") == "non_own" or parsed.get("category") is None:
+        return [], 0, 0, {"query": name, "parser": "llm", "parsed": parsed, "rejected": "non_own"}
     
     # Use LLM-extracted parameters
     ton = parsed.get("tonnage") or 0
@@ -947,7 +947,7 @@ def match_with_llm(name, db, config, api_key=None, model="gpt-4o-mini"):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     print("=" * 60)
-    print("LiuGong Equipment Matching Engine v19")
+    print("Equipment Matching Engine v19")
     print("=" * 60)
     
     config = load_config()
@@ -987,7 +987,7 @@ def main():
                 cost = calc_dap(p["product"].get("dap_price_cny", 0) or 0, p["product"].get("scrap_tax_rub", 0) or 0, config)
                 status = f"★ {p['product']['model']} ({p['score']}分)"
             else:
-                status = "✗ 非柳工产品" if is_non_liugong(item["name"]) else "✗ 未匹配"
+                status = "✗ 非自有产品" if is_non_own(item["name"]) else "✗ 未匹配"
             print(f"  {item['name'][:35]:35s} -> {status}")
     
     print("\n完成!")
